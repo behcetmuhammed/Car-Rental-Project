@@ -48,7 +48,6 @@ public class ModelManager {
     }
 
 
-
     public boolean update(Model model) {
         if (this.getById(model.getId()) == null) {
             Halper.showMessage(model.getId() + " ID kayıtlı model bulunamadı");
@@ -68,4 +67,29 @@ public class ModelManager {
     public ArrayList<Model> getByListBrandId(int brandId) {
         return this.modelDao.getByListBrandId(brandId);
     }
+
+    public ArrayList<Model> searchForTable(int brandId, Model.Fuel fuel, Model.Gear gear, Model.Type type) {
+        String select = "SELECT * FROM public.model";
+        ArrayList<String> whereList = new ArrayList<>();
+        if (brandId != 0) {
+            whereList.add("model_brand_id = " + brandId);
+        }
+        if (fuel != null) {
+            whereList.add("model_fuel = '" + fuel.toString() + "'");
+        }
+        if (gear != null) {
+            whereList.add("model_gear = '" + gear.toString() + "'");
+        }
+        if (type != null) {
+            whereList.add("model_type = '" + type.toString() + "'");
+        }
+        String whereStr = String.join(" AND ", whereList);
+        String query = select;  //SELECT * FROM public.model
+        if (whereStr.length() > 0) {
+            query += " WHERE " + whereStr; //SELECT * FROM public.model WHERE
+        }
+        return this.modelDao.selectByQuery(query);
+    }
+
+
 }

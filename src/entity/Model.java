@@ -94,4 +94,18 @@ public class Model {
     public void setBrand(Brand brand) {
         this.brand = brand;
     }
+
+    @Override
+    public String toString() {
+        return "Model{" +
+                "id=" + id +
+                ", brand_id=" + brand_id +
+                ", name='" + name + '\'' +
+                ", year='" + year + '\'' +
+                ", type=" + type +
+                ", fuel=" + fuel +
+                ", gear=" + gear +
+                ", brand=" + brand +
+                '}';
+    }
 }
