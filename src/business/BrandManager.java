@@ -4,15 +4,18 @@ import core.Halper;
 import dao.BrandDao;
 import dao.UserDao;
 import entity.Brand;
+import entity.Model;
 import entity.User;
 
 import java.util.ArrayList;
 
 public class BrandManager {
     private final BrandDao brandDao;
+    private final ModelManager modelManager;
 
     public BrandManager() {
         this.brandDao = new BrandDao();
+        this.modelManager = new ModelManager();
     }
 
     public ArrayList<Brand> findAll() {
@@ -53,6 +56,9 @@ public class BrandManager {
         if (this.getById(id) == null) {
             Halper.showMessage(id + " ID Kayıtlı Marka Bulunamadı!");
             return false;
+        }
+        for(Model model : this.modelManager.getByListBrandId(id)){
+            this.modelManager.delete(model.getId());
         }
         return this.brandDao.delete(id);
     }

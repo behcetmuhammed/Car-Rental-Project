@@ -5,6 +5,8 @@ import entity.Brand;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class LeyoutView extends JFrame {
@@ -41,7 +43,32 @@ public class LeyoutView extends JFrame {
     }
 
     public int getTableSelectedRow(JTable table, int index){
+//        if (index == -1) {
+//            Halper.showMessage("Lütfen Satır Seçiniz!");
+//        }
         return Integer.parseInt(table.getValueAt(table.getSelectedRow(), index).toString());
+    }
+
+    public void tableRowSelect(JTable table){
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int selected_row = table.rowAtPoint(e.getPoint());
+                table.setRowSelectionInterval(selected_row, selected_row);
+            }
+        });
+    }
+
+    //Bu metod hocadan bağımsız yazdım çünkü kod çalışmıyordu
+    public void popMenuExCode(JTable table, JPopupMenu menu){
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    menu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
     }
 }
 
