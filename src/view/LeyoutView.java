@@ -43,16 +43,13 @@ public class LeyoutView extends JFrame {
     }
 
     public int getTableSelectedRow(JTable table, int index){
-//        if (index == -1) {
-//            Halper.showMessage("Lütfen Satır Seçiniz!");
-//        }
         return Integer.parseInt(table.getValueAt(table.getSelectedRow(), index).toString());
     }
 
     public void tableRowSelect(JTable table){
         table.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 int selected_row = table.rowAtPoint(e.getPoint());
                 table.setRowSelectionInterval(selected_row, selected_row);
             }

@@ -52,7 +52,7 @@ public class ModelView extends LeyoutView {
             if (Halper.isfieldListEmpty(new JTextField[]{this.fld_model_name, this.fld_mode_year})) {
                 Halper.showMessage("fill");
             } else {
-                boolean result = false;
+                boolean result;
                 ComboItem selectedBrand = (ComboItem) cmb_brand.getSelectedItem();
                 this.model.setYear(fld_mode_year.getText());
                 this.model.setName(fld_model_name.getText());
@@ -65,7 +65,6 @@ public class ModelView extends LeyoutView {
                 } else {
                     result = this.modelManager.save(this.model);
                 }
-
                 if(result){
                     Halper.showMessage("done");
                     dispose();

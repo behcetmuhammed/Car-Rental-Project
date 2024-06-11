@@ -36,15 +36,12 @@ public class CarDao {
         return obj;
     }
 
-    //veritabanındaki tüm Model verilerini çekmek
+    //veritabanındaki tüm araba verilerini çekmek
     public ArrayList<Car> findAll() {
         String sql = "SELECT * FROM public.car ORDER BY car_id ASC";
         return this.selectByQuery(sql);
     }
 
-//    public ArrayList<Model> getByListBrandId(int brandId) {
-//        return this.selectByQuery("SELECT * FROM public.model WHERE model_brand_id = " + brandId);
-//    }
 
     //Sorgu Seçmek
     public ArrayList<Car> selectByQuery(String query) {
@@ -65,11 +62,14 @@ public class CarDao {
         Car obj = new Car();
 
         obj.setId(rs.getInt("car_id"));
-        obj.setModel_id(rs.getInt("car_model_name"));
-        obj.setPlate(rs.getString("car_plate"));
+        obj.setModel_id(rs.getInt("car_model_id"));
         obj.setColor(Car.Color.valueOf(rs.getString("car_color")));
         obj.setKm(rs.getInt("car_km"));
-        obj.setModel(this.modelDao.getById(obj.getModel_id()));
+        obj.setPlate(rs.getString("car_plate"));
+        //obj.setModel(this.modelDao.getById(obj.getModel_id()));
+        // Model nesnesini yüklemek için
+        Model model = modelDao.getById(obj.getModel_id());
+        obj.setModel(model);
         return obj;
     }
 
@@ -79,8 +79,8 @@ public class CarDao {
                 "car_model_id = ?, " +
                 "car_color = ?, " +
                 "car_km = ?, " +
-                "car_plate = ?, " +
-                "WHERE car_id (?)";
+                "car_plate = ? " +
+                "WHERE car_id = ?";
         try {
             PreparedStatement pr = this.connection.prepareStatement(query);
             pr.setInt(1, car.getModel_id());
@@ -102,7 +102,7 @@ public class CarDao {
                 "car_model_id," +
                 "car_color," +
                 "car_km," +
-                "car_plate," +
+                "car_plate" +
                 ")" +
                 "VALUES (?,?,?,?)";
         try {
