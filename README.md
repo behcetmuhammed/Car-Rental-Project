@@ -101,7 +101,3 @@ Projenin temel isterleri şunlardır:
 Yani, kullanıcılar belirli bir tarih aralığındaki araçların müsaitlik durumlarını kontrol edebilecekler. Örneğin, "Renault Clio" veya "Volkswagen Polo" gibi kriterlere göre arama yapabilecekler ve uygun araçlardan rezervasyon yapabilecekler.
 
 Projenin amacı, hem araç takibini yapabilmek, hem de müsaitlik durumlarını görebilme ve iş yerini yönetebilme imkanı sağlamaktır.
-
-Araç kiralama projesinin geliştirilmesi, Java katmanlı mimarisi ile yazılım geliştirme, veritabanı işlemlerini yapma, kullanıcı arayüzü oluşturma gibi konularda deneyim sahibi olmanızı sağlayacaktır.
-
-Kolay gelsin, iyi öğrenmeler.
