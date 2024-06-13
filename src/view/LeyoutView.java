@@ -16,7 +16,7 @@ public class LeyoutView extends JFrame {
     //Hazır bir arayüz (View) tasarımı
     public void guiInitialize(int width, int height){
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Kapatma düğmesine basıldığında pencerenin kapatılmasını sağlar.
-        this.setTitle("Rent A Car"); // Pencerenin başlığını "Rent a Car" olarak ayarlar.
+        this.setTitle("Araç Kiralama"); // Pencerenin başlığını "Rent a Car" olarak ayarlar.
         this.setSize(width, height); // Pencerenin boyutunu 600x500 piksel olarak ayarlar.
         this.setLocation(Halper.getLocationPoint("x", this.getSize()), Halper.getLocationPoint("y", this.getSize())); //Pencerenin ekranın ortasına yerleştirilmesini sağlar (Halper sınıfından getLocationPoint metodunu kullanır)
         this.setVisible(true); //LoginView sınıfından bir nesne oluşturulduğunda pencerenin görünür olmasını sağlar.
@@ -29,22 +29,21 @@ public class LeyoutView extends JFrame {
         table.getTableHeader().setReorderingAllowed(false); //tablolarda sütunların yerlerini/alanlarını menual olarak değişimini kapatmak
         table.getColumnModel().getColumn(0).setMaxWidth(75);
         table.setEnabled(false); //tabloların çift tıklanıldığı zaman düzenlenmesini kapatmak
-
         DefaultTableModel clearModel = (DefaultTableModel) table.getModel();
         clearModel.setRowCount(0);
-
         if(rows == null){
             rows = new ArrayList<>();
         }
-
         for(Object[] row : rows){
             model.addRow(row);
         }
     }
 
+
     public int getTableSelectedRow(JTable table, int index){
         return Integer.parseInt(table.getValueAt(table.getSelectedRow(), index).toString());
     }
+
 
     public void tableRowSelect(JTable table){
         table.addMouseListener(new MouseAdapter() {
@@ -55,6 +54,21 @@ public class LeyoutView extends JFrame {
             }
         });
     }
+
+    //Overloading
+    public void tableRowSelected(JTable table,JPopupMenu popupMenu) {
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int selected_row = table.rowAtPoint(e.getPoint());
+                table.setRowSelectionInterval(selected_row, selected_row);
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    popupMenu.show(table, e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
 
     //Bu metod hocadan bağımsız yazdım çünkü kod çalışmıyordu
     public void popMenuExCode(JTable table, JPopupMenu menu){

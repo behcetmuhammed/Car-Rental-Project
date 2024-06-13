@@ -18,6 +18,18 @@ public class BookDao {
         this.carDao = new CarDao();
     }
 
+    public boolean delete(int book_id) {
+        String query = "DELETE FROM public.book WHERE book_id = ?";
+        try {
+            PreparedStatement pr = this.connection.prepareStatement(query);
+            pr.setInt(1, book_id);
+            return pr.executeUpdate() == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     //veritabanındaki tüm araba verilerini çekmek
     public ArrayList<Book> findAll() {
@@ -91,6 +103,22 @@ public class BookDao {
         obj.setNote(rs.getString("book_note"));
         obj.setPrc(rs.getInt("book_prc"));
         return obj;
+    }
+
+    public Book getById(int id) {
+        Book book = null;
+        String query = "SELECT * FROM public.book WHERE book_id = ?";
+        try {
+            PreparedStatement pr = this.connection.prepareStatement(query);
+            pr.setInt(1, id);
+            ResultSet rs = pr.executeQuery();
+            if (rs.next()) {
+                book = this.match(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return book;
     }
 
 }

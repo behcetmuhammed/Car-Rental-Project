@@ -17,7 +17,7 @@ public class CarManager {
     private final CarDao carDao;
     private final BookDao bookDao;
 
-    public CarManager(){
+    public CarManager() {
         this.carDao = new CarDao();
         this.bookDao = new BookDao();
     }
@@ -98,13 +98,13 @@ public class CarManager {
             where.add(" m.model_type = '" + type.toString() + "'");
         }
 
-        String whereStr = String.join(" AND " , where); //Where listesinin içindeki elemanları aralarına "AND" koyarak birleştirir.
-        String joinStr = String.join(" AND " , joinWhere); //JoinWhere listesinin içindeki elemanları aralarına "AND" koyarak birleştirir.
+        String whereStr = String.join(" AND ", where); //Where listesinin içindeki elemanları aralarına "AND" koyarak birleştirir.
+        String joinStr = String.join(" AND ", joinWhere); //JoinWhere listesinin içindeki elemanları aralarına "AND" koyarak birleştirir.
 
-        if(joinStr.length() > 0){
+        if (joinStr.length() > 0) {
             query += " ON " + joinStr;
         }
-        if(whereStr.length() > 0){
+        if (whereStr.length() > 0) {
             query += " WHERE " + whereStr;
         }
 
@@ -121,7 +121,7 @@ public class CarManager {
         ArrayList<Book> bookList = this.bookDao.selectByQuery(bookQuery);
         ArrayList<Integer> busyCarId = new ArrayList<>();
 
-        for(Book book : bookList){
+        for (Book book : bookList) {
             busyCarId.add(book.getCar_id());
         }
 
@@ -131,6 +131,5 @@ public class CarManager {
 
         return searchCarList;
     }
-
 
 }

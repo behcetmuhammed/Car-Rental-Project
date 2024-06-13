@@ -6,10 +6,8 @@ import business.CarManager;
 import business.ModelManager;
 import core.ComboItem;
 import core.Halper;
-import entity.Brand;
-import entity.Car;
-import entity.Model;
-import entity.User;
+import dao.CarDao;
+import entity.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -42,6 +40,7 @@ public class AdminView extends LeyoutView {
     private JComboBox<Model.Gear> cmb_booking_gear;
     private JComboBox<Model.Fuel> cmb_booking_fuel;
     private JComboBox<Model.Type> cmb_booking_type;
+    private JComboBox cmb_rentals_plate;
 
     private JButton btn_search_model;
     private JButton btn_cncl_model;
@@ -56,12 +55,18 @@ public class AdminView extends LeyoutView {
     private JButton btn_booking_search;
     private JPanel pnl_booking_search;
     private JButton btn_cncl_booking;
+    private JPanel pnl_rentals;
+    private JScrollPane scrl_rentals;
+    private JTable tbl_rentals;
+    private JButton btn_srch_rentals_model;
+    private JButton btn_cncl_rentals;
     private User user;
 
     private DefaultTableModel tmdl_brand = new DefaultTableModel();
     private DefaultTableModel tmdl_model = new DefaultTableModel();
     private DefaultTableModel tmdl_car = new DefaultTableModel();
     private DefaultTableModel tmdl_booking = new DefaultTableModel();
+    private DefaultTableModel tmdl_rentals = new DefaultTableModel();
 
     private BrandManager brandManager;
     private ModelManager modelManager;
@@ -72,9 +77,11 @@ public class AdminView extends LeyoutView {
     private JPopupMenu model_Menu;
     private JPopupMenu car_Menu;
     private JPopupMenu book_Menu;
+    private JPopupMenu rentals_Menu;
 
     private Object[] col_model;
     private Object[] col_car;
+    private Object[] col_rentals;
 
     public AdminView(User user) {
         this.brandManager = new BrandManager();
@@ -88,6 +95,11 @@ public class AdminView extends LeyoutView {
             dispose();
         }
         this.lbl_welcome.setText("Hoşgeldiniz: " + this.user.getUsername());
+
+
+        //Admin View daki ÇIKIŞ YAP butonu
+        loadLogoutComponent();
+
 
         //Brand Tab Menu
         loadBrandTable();
@@ -107,7 +119,72 @@ public class AdminView extends LeyoutView {
         loadBookingComponent();
         loadBookingFilter();
 
+        //Rentals Tab Menu
+        loadRentalsTable(null);
+        loadRentalsComponent();
+        loadRentalsFilter();
+
     }
+
+    //Kiralamaları yükle
+    private void loadRentalsTable(ArrayList<Object[]> bookList) {
+        col_rentals = new Object[]{"ID", "Plaka", "Araç Marka", "Araç Model", "Müşteri", "Telefon", "Mail", "T.C.", "Başlangıç Tarihi", "Bitiş tarihi", "Fiyat"};
+        if (bookList == null) {
+            bookList = this.bookManager.getForTable(col_rentals.length, this.bookManager.findAll());
+        }
+        createTable(this.tmdl_rentals, this.tbl_rentals, col_rentals, bookList);
+    }
+
+    // Kiralama Componentlerini yükle
+    public void loadRentalsComponent() {
+        this.rentals_Menu = new JPopupMenu();
+        this.rentals_Menu.add("İptal Et").addActionListener(e -> {
+            if (Halper.confirm("sure")) {
+                int selectBookId = this.getTableSelectedRow(this.tbl_rentals, 0);
+
+                if (this.bookManager.delete(selectBookId)) {
+                    Halper.showMessage("done");
+                    loadRentalsTable(null);
+                } else {
+                    Halper.showMessage("error");
+                }
+            }
+        });
+
+        this.rentals_Menu.setComponentPopupMenu(rentals_Menu);
+        //tableRowSelect();
+        tableRowSelected(this.tbl_rentals, rentals_Menu);
+
+        btn_srch_rentals_model.addActionListener(e -> {
+            ComboItem selectedCar = (ComboItem) this.cmb_rentals_plate.getSelectedItem();
+            int carId = 0;
+            if (selectedCar != null) {
+                carId = selectedCar.getKey();
+            }
+
+            ArrayList<Book> bookListBySearch = this.bookManager.searchForTable(carId);
+            ArrayList<Object[]> bookRowListBySearch = this.bookManager.getForTable(this.col_rentals.length, bookListBySearch);
+            loadRentalsTable(bookRowListBySearch);
+        });
+        this.btn_cncl_rentals.addActionListener(e -> {
+            loadRentalsFilter();
+        });
+        popMenuExCode(tbl_rentals, rentals_Menu); //benim yazdığım ekstra fonk.
+    }
+
+
+    //Kiralamaları filtreleme işlemi
+    public void loadRentalsFilter() {
+        this.cmb_rentals_plate.removeAllItems();
+        for (Car obj : this.carManager.findAll()) {
+            this.cmb_rentals_plate.addItem(new ComboItem(obj.getId(), obj.getPlate()));
+        }
+        this.cmb_rentals_plate.setSelectedItem(null);
+    }
+
+
+    ///////////////////    ///////////////////    ///////////////////    ///////////////////    ///////////////////
+
 
     // Kiralama Componentlerini yükle
     public void loadBookingComponent() {
@@ -149,11 +226,10 @@ public class AdminView extends LeyoutView {
         });
 
 
-
         this.btn_search_model.addActionListener(e -> {
             ComboItem selectedBrand = (ComboItem) this.cmb_s_model_brand.getSelectedItem();
             int brandId = 0;
-            if(selectedBrand != null){
+            if (selectedBrand != null) {
                 brandId = selectedBrand.getKey();
             }
             ArrayList<Model> modelListBySearch = this.modelManager.searchForTable(
@@ -166,7 +242,7 @@ public class AdminView extends LeyoutView {
             loadModelTable(modelRowListBySearch);
         });
 
-        this.btn_cncl_model.addActionListener(e ->{
+        this.btn_cncl_model.addActionListener(e -> {
             this.cmb_s_model_type.setSelectedItem(null);
             this.cmb_s_model_gear.setSelectedItem(null);
             this.cmb_s_model_fuel.setSelectedItem(null);
@@ -175,11 +251,13 @@ public class AdminView extends LeyoutView {
         });
     }
 
+
     //Kiralamaları yükle
     public void loadBookingTable(ArrayList<Object[]> carList) {
-        Object[] col_booking_list = {"ID", "Marka", "Model" , "Plaka", "Renk", "KM", "Yıl", "Tip", "Yakıt Türü", "Vites"};
+        Object[] col_booking_list = {"ID", "Marka", "Model", "Plaka", "Renk", "KM", "Yıl", "Tip", "Yakıt Türü", "Vites"};
         createTable(this.tmdl_booking, this.tbl_booking, col_booking_list, carList);
     }
+
 
     //Kiralamaları filtreleme işlemi
     public void loadBookingFilter() {
@@ -236,7 +314,7 @@ public class AdminView extends LeyoutView {
         this.btn_search_model.addActionListener(e -> {
             ComboItem selectedBrand = (ComboItem) this.cmb_s_model_brand.getSelectedItem();
             int brandId = 0;
-            if(selectedBrand != null){
+            if (selectedBrand != null) {
                 brandId = selectedBrand.getKey();
             }
             ArrayList<Model> modelListBySearch = this.modelManager.searchForTable(
@@ -249,7 +327,7 @@ public class AdminView extends LeyoutView {
             loadModelTable(modelRowListBySearch);
         });
 
-        this.btn_cncl_model.addActionListener(e ->{
+        this.btn_cncl_model.addActionListener(e -> {
             this.cmb_s_model_type.setSelectedItem(null);
             this.cmb_s_model_gear.setSelectedItem(null);
             this.cmb_s_model_fuel.setSelectedItem(null);
@@ -260,7 +338,7 @@ public class AdminView extends LeyoutView {
 
     //Arabaları yükle
     public void loadCarTable() {
-        this.col_car = new Object[]{"ID", "Marka", "Model" , "Plaka", "Renk", "KM", "Yıl", "Tip", "Yakıt Türü", "Vites"};
+        this.col_car = new Object[]{"ID", "Marka", "Model", "Plaka", "Renk", "KM", "Yıl", "Tip", "Yakıt Türü", "Vites"};
         ArrayList<Object[]> carList = this.carManager.getForTable(col_car.length, this.carManager.findAll());
         createTable(this.tmdl_car, this.tbl_car, col_car, carList);
     }
@@ -288,6 +366,7 @@ public class AdminView extends LeyoutView {
                 @Override
                 public void windowClosed(WindowEvent e) {
                     loadModelTable(null);
+                    loadBookingTable(null);
                 }
             });
         });
@@ -310,7 +389,7 @@ public class AdminView extends LeyoutView {
         this.btn_search_model.addActionListener(e -> {
             ComboItem selectedBrand = (ComboItem) this.cmb_s_model_brand.getSelectedItem();
             int brandId = 0;
-            if(selectedBrand != null){
+            if (selectedBrand != null) {
                 brandId = selectedBrand.getKey();
             }
             ArrayList<Model> modelListBySearch = this.modelManager.searchForTable(
@@ -323,7 +402,7 @@ public class AdminView extends LeyoutView {
             loadModelTable(modelRowListBySearch);
         });
 
-        this.btn_cncl_model.addActionListener(e ->{
+        this.btn_cncl_model.addActionListener(e -> {
             this.cmb_s_model_type.setSelectedItem(null);
             this.cmb_s_model_gear.setSelectedItem(null);
             this.cmb_s_model_fuel.setSelectedItem(null);
@@ -344,13 +423,6 @@ public class AdminView extends LeyoutView {
 
 
     //Brandleri yükle
-    public void loadBrandTable() {
-        Object[] col_brand = {"Marka ID", "Marka Adı"};
-        ArrayList<Object[]> brandList = this.brandManager.getForTable(col_brand.length);
-        createTable(this.tmdl_brand, this.tbl_brand, col_brand, brandList);
-    }
-
-
     public void loadModelFilter() {
         this.cmb_s_model_type.setModel(new DefaultComboBoxModel<>(Model.Type.values()));
         this.cmb_s_model_type.setSelectedItem(null);
@@ -361,6 +433,7 @@ public class AdminView extends LeyoutView {
         loadModelFilterBrand();
     }
 
+
     public void loadModelFilterBrand() {
         this.cmb_s_model_brand.removeAllItems();
         for (Brand obj : brandManager.findAll()) {
@@ -369,6 +442,12 @@ public class AdminView extends LeyoutView {
         this.cmb_s_model_brand.setSelectedItem(null);
     }
 
+
+    public void loadBrandTable() {
+        Object[] col_brand = {"Marka ID", "Marka Adı"};
+        ArrayList<Object[]> brandList = this.brandManager.getForTable(col_brand.length);
+        createTable(this.tmdl_brand, this.tbl_brand, col_brand, brandList);
+    }
 
     // Markaların Componentlerini yükle
     public void loadBrandComponent() {
@@ -383,6 +462,7 @@ public class AdminView extends LeyoutView {
                     loadBrandTable();
                     loadModelTable(null);
                     loadModelFilterBrand();
+                    loadBookingTable(null);
                 }
             });
         });
@@ -397,6 +477,7 @@ public class AdminView extends LeyoutView {
                     loadModelTable(null);
                     loadModelFilterBrand();
                     loadCarTable();
+                    loadBookingTable(null);
                 }
             });
         });
@@ -428,4 +509,16 @@ public class AdminView extends LeyoutView {
         this.fld_fnsh_date.setText("11/06/2024");
 
     }
+
+
+    public void loadLogoutComponent() {
+        btn_logout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                LoginView loginView = new LoginView();
+            }
+        });
+    }
+
 }
