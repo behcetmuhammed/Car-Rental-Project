@@ -31,13 +31,13 @@ Bu proje, Java ve Swing kullanılarak geliştirilen bir araç kiralama uygulamas
 
 2. Veritabanını oluşturun ve gerekli tabloları oluşturun:
     ```sql
-    CREATE DATABASE arac_kiralama;
+    CREATE DATABASE rentalCar;
     ```
 
 3. Veritabanı bağlantı ayarlarını yapın:
     `src/main/resources/application.properties` dosyasındaki veritabanı bağlantı ayarlarını güncelleyin:
     ```properties
-    spring.datasource.url=jdbc:postgresql://localhost:5432/arac_kiralama
+    spring.datasource.url=jdbc:postgresql://localhost:5432/rentalCar
     spring.datasource.username=postgres
     spring.datasource.password=sifre
     ```
