@@ -25,8 +25,8 @@ Bu proje, Java ve Swing kullanılarak geliştirilen bir araç kiralama uygulamas
 ### Adımlar
 1. Depoyu klonlayın:
     ```sh
-    git clone https://github.com/kullanici-adi/arac-kiralama.git
-    cd arac-kiralama
+    [git clone https://github.com/behcetmuhammed/Car-Rental-Project.git]
+    cd rentalCar
     ```
 
 2. Veritabanını oluşturun ve gerekli tabloları oluşturun:
